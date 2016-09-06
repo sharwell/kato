@@ -32,6 +32,11 @@ SolutionInfo.cs
 *.DotSettings.user
 .vs/
 
-# NuGet Packages
-*.nupkg
+# NuGet Package Restore (inputs)
 packages/
+*.lock.json
+*.nuget.props
+*.nuget.targets
+
+# NuGet Packages (outputs)
+*.nupkg
