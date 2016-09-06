@@ -69,26 +69,14 @@ namespace JenkinsApiClient
 			}
 		}
 
-		public static string GetJson(Uri path, UserCredentials credential = null)
-		{
-			using (HttpClient client = new HttpClient { BaseAddress = new Uri(path.Scheme + "://" + path.Host + ":" + path.Port) })
-			{
-
-				var cred = EnsureCredentials(client.BaseAddress.ToString(), credential);
-				client.ApplyCredentials(cred);
-				HttpResponseMessage result = client.GetAsync(path.PathAndQuery).Result;
-				result.EnsureSuccessStatusCode();
-				return result.Content.ReadAsStringAsync().Result;
-			}
-		}
-
-		public static ConsoleOutput GetConsoleOutput(Uri path, long offset, UserCredentials credential = null)
+		public static async Task<ConsoleOutput> GetConsoleOutputAsync(Uri path, long offset, UserCredentials credential = null)
 		{
 			using (HttpClient client = new HttpClient { BaseAddress = new Uri(path.Scheme + "://" + path.Host + ":" + path.Port) })
 			{
 				var cred = EnsureCredentials(client.BaseAddress.ToString(), credential);
 				client.ApplyCredentials(cred);
-				HttpResponseMessage result = client.GetAsync(path.PathAndQuery + "logText/progressiveText?start=" + offset).Result;
+
+				HttpResponseMessage result = await client.GetAsync(path.PathAndQuery + "logText/progressiveText?start=" + offset).ConfigureAwait(false);
 				result.EnsureSuccessStatusCode();
 
 				long newOffset = int.Parse(result.Headers.GetValues("X-Text-Size").Single());
@@ -96,7 +84,7 @@ namespace JenkinsApiClient
 				IEnumerable<string> values;
 				bool isBuilding = result.Headers.TryGetValues("X-More-Data", out values);
 
-				return new ConsoleOutput { Text = result.Content.ReadAsStringAsync().Result, Offset = newOffset, IsBuilding = isBuilding };
+				return new ConsoleOutput { Text = await result.Content.ReadAsStringAsync().ConfigureAwait(false), Offset = newOffset, IsBuilding = isBuilding };
 			}
 		}
 
