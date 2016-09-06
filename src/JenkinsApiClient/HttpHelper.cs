@@ -56,17 +56,16 @@ namespace JenkinsApiClient
 		#endregion
 
 
-		public static Task<string> GetJsonAsync(Uri path, UserCredentials credential = null)
+		public static async Task<string> GetJsonAsync(Uri path, UserCredentials credential = null)
 		{
 			using (HttpClient client = new HttpClient { BaseAddress = new Uri(path.Scheme + "://" + path.Host + ":" + path.Port) })
 			{
-
 				var cred = EnsureCredentials(client.BaseAddress.ToString(), credential);
 				client.ApplyCredentials(cred);
 
-				HttpResponseMessage result = client.GetAsync(path.PathAndQuery).Result;
+				HttpResponseMessage result = await client.GetAsync(path.PathAndQuery).ConfigureAwait(false);
 				result.EnsureSuccessStatusCode();
-				return result.Content.ReadAsStringAsync();
+				return await result.Content.ReadAsStringAsync().ConfigureAwait(false);
 			}
 		}
 
@@ -101,15 +100,15 @@ namespace JenkinsApiClient
 			}
 		}
 
-		public static Task<string> PostDataAsync(Uri path, string data = "", UserCredentials credential = null)
+		public static async Task<string> PostDataAsync(Uri path, string data = "", UserCredentials credential = null)
 		{
 			using (HttpClient client = new HttpClient { BaseAddress = new Uri(path.Scheme + "://" + path.Host + ":" + path.Port) })
 			{
 				var cred = EnsureCredentials(client.BaseAddress.ToString(), credential);
 				client.ApplyCredentials(cred);
-				HttpResponseMessage result = client.PostAsync(path.PathAndQuery, new StringContent(data)).Result;
+				HttpResponseMessage result = await client.PostAsync(path.PathAndQuery, new StringContent(data)).ConfigureAwait(false);
 				result.EnsureSuccessStatusCode();
-				return result.Content.ReadAsStringAsync();
+				return await result.Content.ReadAsStringAsync().ConfigureAwait(false);
 			}
 		}
 
