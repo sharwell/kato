@@ -50,7 +50,7 @@ namespace JenkinsApiClient
 			return source.Substring(0, 1).ToLower() + source.Substring(1, source.Length - 1);
 		}
 
-		public Task<string> GetJsonAsync<T>(Uri uri)
+		public Task<string> GetRawJsonAsync<T>(Uri uri)
 		{
 			Uri apiRoute = JenkinsApiHelper.GetApiRoute(uri);
 			string members = GetMembers<T>();
@@ -73,11 +73,12 @@ namespace JenkinsApiClient
 
 		readonly Uri m_baseUri;
 
-		public T GetJson<T>(Uri uri) where T : class
+		public async Task<T> GetJsonAsync<T>(Uri uri)
+			where T : class
 		{
 			Uri apiRoute = JenkinsApiHelper.GetApiRoute(uri);
 			string members = GetMembers<T>();
-			return HttpHelper.GetObject<T>(HttpHelper.GetJson(new Uri(apiRoute.OriginalString + "?tree=" + members, UriKind.Absolute),Credentials));
+			return HttpHelper.GetObject<T>(await HttpHelper.GetJsonAsync(new Uri(apiRoute.OriginalString + "?tree=" + members, UriKind.Absolute),Credentials).ConfigureAwait(false));
 		}
 	}
 }
