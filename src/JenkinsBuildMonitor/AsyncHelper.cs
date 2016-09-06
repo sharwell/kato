@@ -4,7 +4,7 @@ namespace Kato
 {
 	internal static class AsyncHelper
 	{
-		public static Task<T> LogErrors<T>(this Task<T> task)
+		public static Task<T> LogErrorsAsync<T>(this Task<T> task)
 		{
 			return task.ContinueWith(x =>
 			{

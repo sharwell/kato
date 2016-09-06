@@ -57,7 +57,7 @@ namespace Kato
 		{
 			try
 			{
-				Job source = JsonConvert.DeserializeObject<Job>(m_client.GetJsonAsync<Job>(job.Path).LogErrors().Result);
+				Job source = JsonConvert.DeserializeObject<Job>(m_client.GetJsonAsync<Job>(job.Path).LogErrorsAsync().Result);
 
 				if (source == null)
 					return;

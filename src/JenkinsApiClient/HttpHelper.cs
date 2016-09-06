@@ -101,7 +101,7 @@ namespace JenkinsApiClient
 			}
 		}
 
-		public static Task<string> PostData(Uri path, string data = "", UserCredentials credential = null)
+		public static Task<string> PostDataAsync(Uri path, string data = "", UserCredentials credential = null)
 		{
 			using (HttpClient client = new HttpClient { BaseAddress = new Uri(path.Scheme + "://" + path.Host + ":" + path.Port) })
 			{
