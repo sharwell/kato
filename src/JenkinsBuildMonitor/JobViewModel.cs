@@ -166,7 +166,7 @@ namespace Kato
 
 		public void ForceBuild()
 		{
-			m_client.ForceBuild(Path).LogErrors();
+			m_client.ForceBuildAsync(Path).LogErrorsAsync();
 		}
 
 		public bool CanViewConsoleOutput()
@@ -187,7 +187,7 @@ namespace Kato
 
 		public void DisableBuild()
 		{
-			m_client.DisableJob(Path).LogErrors();
+			m_client.DisableJobAsync(Path).LogErrorsAsync();
 		}
 
 		public bool CanEnableBuild()
@@ -197,7 +197,7 @@ namespace Kato
 
 		public void EnableBuild()
 		{
-			m_client.EnableJob(Path).LogErrors();
+			m_client.EnableJobAsync(Path).LogErrorsAsync();
 		}
 
 		public void OpenInBrowser(ActionExecutionContext context)

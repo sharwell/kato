@@ -57,18 +57,18 @@ namespace JenkinsApiClient
 			return HttpHelper.GetJsonAsync(new Uri(apiRoute.OriginalString + "?tree=" + members, UriKind.Absolute),Credentials);
 		}
 
-		public Task<string> ForceBuild(Uri jobUri)
+		public Task<string> ForceBuildAsync(Uri jobUri)
 		{
-			return HttpHelper.PostData(new Uri(jobUri, "build"),"",Credentials);
+			return HttpHelper.PostDataAsync(new Uri(jobUri, "build"),"",Credentials);
 		}
 
-		public Task<string> DisableJob(Uri jobUri)
+		public Task<string> DisableJobAsync(Uri jobUri)
 		{
-			return HttpHelper.PostData(new Uri(jobUri, "disable"),"",Credentials);
+			return HttpHelper.PostDataAsync(new Uri(jobUri, "disable"),"",Credentials);
 		}
-		public Task<string> EnableJob(Uri jobUri)
+		public Task<string> EnableJobAsync(Uri jobUri)
 		{
-			return HttpHelper.PostData(new Uri(jobUri, "enable"),"",Credentials);
+			return HttpHelper.PostDataAsync(new Uri(jobUri, "enable"),"",Credentials);
 		}
 
 		readonly Uri m_baseUri;
