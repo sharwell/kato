@@ -29,7 +29,7 @@ namespace JenkinsApiClient
 
 		private string GetMembers<T>()
 		{
-			var members = typeof(T).GetProperties(BindingFlags.Instance | BindingFlags.Public);
+			var members = typeof(T).GetTypeInfo().GetProperties(BindingFlags.Instance | BindingFlags.Public);
 
 			return string.Join(",", members.Select(x =>
 			{
