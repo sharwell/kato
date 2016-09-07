@@ -22,7 +22,7 @@ namespace Kato
 		private void DoFetchOutput()
 		{
 			m_timer.IsEnabled = false;
-			Task.Run(() => HttpHelper.GetConsoleOutput(m_model.Path, m_lastOffset))
+			Task.Run(() => HttpHelper.GetConsoleOutputAsync(m_model.Path, m_lastOffset))
 			.ContinueWith(x =>
 			{
 				var result = x.Result;

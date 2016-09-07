@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using Caliburn.Micro;
 using JenkinsApiClient;
 using Newtonsoft.Json;
@@ -46,17 +48,20 @@ namespace Kato
 			}
 		}
 
-		public void Update()
+		public Task UpdateAsync()
 		{
+			List<Task> tasks = new List<Task>();
 			foreach (JobViewModel job in m_jobs.Where(x => x.IsSubscribed))
-				UpdateJob(job);
+				tasks.Add(UpdateJobAsync(job));
+
+			return Task.WhenAll(tasks);
 		}
 
-		private void UpdateJob(JobViewModel job)
+		private async Task UpdateJobAsync(JobViewModel job)
 		{
 			try
 			{
-				Job source = JsonConvert.DeserializeObject<Job>(m_client.GetRawJsonAsync<Job>(job.Path).LogErrorsAsync().Result);
+				Job source = JsonConvert.DeserializeObject<Job>(await m_client.GetRawJsonAsync<Job>(job.Path).LogErrorsAsync().ConfigureAwait(true));
 
 				if (source == null)
 					return;

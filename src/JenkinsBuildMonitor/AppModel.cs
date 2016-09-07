@@ -36,7 +36,7 @@ namespace Kato
 			m_taskbarItemInfo = taskbarItemInfo;
 			m_servers = new ObservableCollection<ServerViewModel>();
 			m_settings = PersistedUserSettings.Open<UserSettings>() ?? new UserSettings { Servers = new List<SavedJenkinsServers>() };
-			m_timer = new DispatcherTimer(TimeSpan.FromSeconds(c_projectUpdateInterval), DispatcherPriority.Background, (sender, args) => Update(), Dispatcher.CurrentDispatcher);
+			m_timer = new DispatcherTimer(TimeSpan.FromSeconds(c_projectUpdateInterval), DispatcherPriority.Background, (sender, args) => UpdateAsync(), Dispatcher.CurrentDispatcher);
 			Status = new StatusViewModel();
 			m_subscribedJobs = new ObservableCollection<JobViewModel>();
 
@@ -264,13 +264,16 @@ namespace Kato
 				job.IsHidden = !string.IsNullOrWhiteSpace(m_subscribeFilter) && !job.Name.ToLower().Contains(m_subscribeFilter.ToLower());
 		}
 
-		private void Update()
+		private async Task UpdateAsync()
 		{
 			if (!m_servers.Any())
 				return;
 
+			List<Task> updateTasks = new List<Task>();
 			foreach (ServerViewModel server in m_servers)
-				server.Update();
+				updateTasks.Add(server.UpdateAsync());
+
+			await Task.WhenAll(updateTasks).ConfigureAwait(false);
 
 			var subscribedJobs = m_servers.SelectMany(x => x.Jobs.Where(j => j.IsSubscribed)).ToList();
 			BuildStatus status = subscribedJobs.Any() ? subscribedJobs.Min(x => x.Status) : BuildStatus.Unknown;
@@ -283,7 +286,7 @@ namespace Kato
 			}
 
 			SubscribedJobs = new ObservableCollection<JobViewModel>(subscribedJobs);
-			Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, new System.Action(SetTaskBarStatus));
+			await Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, new System.Action(SetTaskBarStatus));
 		}
 
 		private string GetIconName(BuildStatus status)
@@ -329,7 +332,8 @@ namespace Kato
 					AddServer(server.DomainUrl, server.RequiresAuthentication);
 				}
 			}
-			Update();
+
+			UpdateAsync();
 			SaveSettings();
 		}
 
@@ -390,7 +394,7 @@ namespace Kato
 			try
 			{
 				JenkinsClient client = new JenkinsClient(new Uri(serverUri, UriKind.Absolute), userCreds);
-				Server server = client.GetJson<Server>(new Uri(serverUri));
+				Server server = client.GetJsonAsync<Server>(new Uri(serverUri)).GetAwaiter().GetResult();
 				server.RequiresAuthentication = authRequired;
 
 				serverViewModel = new ServerViewModel(client, server);
@@ -521,7 +525,7 @@ namespace Kato
 			try
 			{
 				var apiUri = JenkinsApiHelper.GetApiRoute(new Uri(serverUrl, UriKind.Absolute));
-				var response = HttpHelper.GetJson(apiUri, creds);
+				var response = HttpHelper.GetJsonAsync(apiUri, creds).GetAwaiter().GetResult();
 				return true;
 			}
 			catch (Exception e)
