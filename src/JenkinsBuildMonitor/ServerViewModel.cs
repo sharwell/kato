@@ -12,13 +12,13 @@ namespace Kato
 	public enum BuildStatus
 	{
 		Unknown,
-		Disabled,
 		AbortedAndBuilding,
 		Aborted,
 		FailedAndBuilding,
 		Failed,
 		SuccessAndBuilding,
 		Success,
+		Disabled,
 	}
 
 	public class ServerViewModel : PropertyChangedBase
